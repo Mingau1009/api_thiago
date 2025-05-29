@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+
+<body>
+    <div class="login-form">
+        <div style="overflow-x: auto; width: 300px;">
+            <img src="logo.jpeg" alt="Login" style="width: 130px; height: 130px;">
+        </div>
+
+        <form onsubmit="return login(event)">
+            <div class="text">Login</div>
+
+            <div class="field">
+                <div class="fas fa-envelope"></div>
+                <input type="text" id="usuario" placeholder="Usuário" required>
+            </div>
+
+            <div class="field password-field">
+                <div class="fas fa-lock"></div>
+                <input type="password" id="senha" placeholder="Senha" required>
+                <i class="far fa-eye eye-icon" id="togglePassword" style="position: absolute; right: 20px; top: 15px; color: white; cursor: pointer;"></i>
+            </div>
+
+            <button type="submit">LOGIN</button>
+        </form>
+    </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const senha = document.getElementById('senha');
+
+        togglePassword.addEventListener('click', function () {
+            const type = senha.type === 'password' ? 'text' : 'password';
+            senha.type = type;
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        async function login(event) {
+            event.preventDefault();
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+
+            try {
+                const response = await fetch('login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, senha })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    window.location.href = '../Funcionario/index.php';
+                } else {
+                    throw new Error(data.erro || 'Erro desconhecido');
+                }
+            } catch (error) {
+                alert(error.message);
+                document.getElementById('senha').value = '';
+                document.getElementById('usuario').focus();
+            }
+        }
+    </script>
+</body>
+</html>
